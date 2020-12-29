@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<form id="url-form">
+    <h1>Input URL</h1>
+    <input class="input" type="text" id="url" placeholder="Text input">
+    <div class="control">
+        <div class="select">
+            <select id="expired_date">
+                <option value="1">1 day</option>
+                <option value="3">3 days</option>
+                <option value="7">7 days</option>
+                <option value="30">1 month</option>
+                <option selected value="90">3 months</option>
+                <option value="365">12 months</option>
+            </select>
+        </div>
+    </div>
+    <div class="control">
+        <button class="button is-primary">Shorten!</button>
+    </div>
+</form>
+<article class="message is-primary" id="article" style="display:None">
+    <div class="message-header">
+        <p>
+            Success
+        </p>
+    </div>
+    <div class="message-body">
+
+    </div>
+</article>
+<script>
+    $('#url-form').submit(e=>{
+
+    var url = $('#url').val()
+    if (url.includes('http')){
+    var exp = $('#expired_date').val()
+    console.log(url)
+    console.log(exp)
+    $.ajax({
+    type: 'POST',
+    url: '/shorten',
+    data: JSON.stringify({url: url, expiredDate: exp}),
+    success: (data)=>{
+        data=JSON.parse(data)
+        console.log(data)
+        $(".message-body").first().text("Your url: " + window.location.origin+'/'+data["hash"])
+        $("#article").show()
+    },
+    contentType: 'application/json',
+    datatype: 'json'})
+    }
+    else {
+    $('#url').addClass('is-danger').delay(200).queue(()=>{
+    $(this).removeClass('is-danger').dequeue();
+    })
+    }
+    e.preventDefault();
+    })
+</script>
+</body>
+</html>
