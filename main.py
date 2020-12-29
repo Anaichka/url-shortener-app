@@ -18,13 +18,16 @@ def index():
 @app.route('/shorten', methods=['POST'])
 def shortened_link():
     url = request.json['url']
-    expired_date = request.json['expiredDate']
-    hash_url = ''.join(random.choices(string.ascii_letters, k=4))
-    expired_date = datetime.now() + timedelta(days=int(expired_date))
-    while Link.objects(hash=hash_url):
+    if url and url is not None:
+        expired_date = request.json['expiredDate']
         hash_url = ''.join(random.choices(string.ascii_letters, k=4))
-    Link(expired_date=expired_date, url=url, hash=hash_url).save()
-    return json.dumps({"success": True, "hash": hash_url, "url": request.base_url.replace("shorten", hash_url) }), 200, {"ContentType": "application/json"}
+        expired_date = datetime.now() + timedelta(days=int(expired_date))
+        while Link.objects(hash=hash_url):
+            hash_url = ''.join(random.choices(string.ascii_letters, k=4))
+        Link(expired_date=expired_date, url=url, hash=hash_url).save()
+        return json.dumps({"success": True, "hash": hash_url, "url": request.base_url.replace("shorten", hash_url) }), 200, {"ContentType": "application/json"}
+    else:
+        return json.dumps({"success": False}), 400, {"ContentType": "application/json"}
 
 @app.route('/<hash_url>')
 def hash_redirect(hash_url):

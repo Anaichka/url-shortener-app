@@ -5,14 +5,6 @@ from main import connect
 
 
 class ApiTest(unittest.TestCase):
-    def test_status_code(self):
-        url = 'http://127.0.0.1:5000/shorten'
-        data = {
-            "url": "http://www.nooooooooooooooo.com/",
-            "expiredDate": "7"
-        }
-        response = requests.post(url, json=data)
-        self.assertEqual(str(response.status_code), "200")
 
     def test_hash_created(self):
         url = 'http://127.0.0.1:5000/shorten'
@@ -35,3 +27,17 @@ class ApiTest(unittest.TestCase):
         hash_url = case_data["hash"]
         link = Link.objects(hash=hash_url).first()
         self.assertEqual(link.url, data["url"])
+
+    def test_link_empty(self):
+        url = 'http://127.0.0.1:5000/shorten'
+        data = {
+            "url": "",
+            "expiredDate": "365"
+        }
+        response = requests.post(url, json=data)
+        case_data = response.json()
+        req_result = case_data["success"]
+        self.assertEqual(req_result, 'false')
+
+        
+
